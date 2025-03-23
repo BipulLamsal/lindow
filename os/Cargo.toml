@@ -1,0 +1,15 @@
+[package]
+name = "os"
+version = "0.1.0"
+edition = "2018"
+
+
+[dependencies]
+
+[profile.dev]
+panic = "abort" # so basically this allows to terminate the process upon panic
+
+[profile.release]
+panic = "abort"
+
+
