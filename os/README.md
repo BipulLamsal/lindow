@@ -15,3 +15,10 @@ cargo rustc -- -C link-arg=-nostartfiles
 cargo rustc -- -C link-arg=-nostartfiles
 
 ```
+
+
+Running the os
+```
+qemu-system-x86_64 -drive file=./target/target/debug/bootimage-os.bin
+
+```
