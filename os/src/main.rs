@@ -6,15 +6,16 @@
 #![no_main]
 use core::arch::asm;
 use core::panic::PanicInfo;
-use core::usize;
-
 const VGA_BUFFER: *mut u8 = 0xb8000 as *mut u8;
 const SCREEN_SIZE: usize = 80 * 50;
+
+mod vga_buffer;
+
 // define bare metal main function to run within os runtime
 #[no_mangle]
 extern "C" fn _start() -> ! {
     // starting buffer ffor vga of x86 systems and creating a raw mutable pointer
-    let text = b"Anupama!";
+    let text = b"BIPUL LAMSAL!";
     let mut x = 0;
 
     loop {
@@ -25,12 +26,11 @@ extern "C" fn _start() -> ! {
                 asm!("NOP");
             }
         }
-        clear_screen(2);
+        clear_screen(vga_buffer::Color::Red);
     }
 }
 
 /*
- *
  * Occupies two bytes : One for character itself another for attribute byte
  * Bit  76543210
         ||||||||
@@ -51,14 +51,13 @@ fn write_character(text: &[u8], forecolor: u8, backcolor: u8, x: u8, y: u8) {
     }
 }
 
-pub fn clear_screen(background: u8) {
-    let attribute = (background << 4) | 0x07;
-    let blank_char = b' ';
-
+fn clear_screen(background: vga_buffer::Color) {
     unsafe {
-        for i in 0..SCREEN_SIZE {
-            *VGA_BUFFER.add(i) = blank_char;
-            *VGA_BUFFER.offset(i as isize + 1) = attribute;
+        for i in 0..(SCREEN_SIZE) {
+            let char_offset = i * 2;
+            let attr_offset = char_offset + 1;
+            *VGA_BUFFER.add(char_offset) = b' ';
+            *VGA_BUFFER.add(attr_offset) = background.as_u8() << 4;
         }
     }
 }
