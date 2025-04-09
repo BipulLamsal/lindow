@@ -16,11 +16,11 @@ mod vga_buffer;
 extern "C" fn _start() -> ! {
     // starting buffer ffor vga of x86 systems and creating a raw mutable pointer
     let text = b"BIPUL LAMSAL!";
-    let mut x = 0;
+    let x = 0;
 
     loop {
-        write_character(text, 0, 10, x + 1, 10);
-        x = (x + 1) % 70;
+        write_character(text, 0, 10, x + 1, 10, true);
+        // x = (x + 1) % 70;
         for _ in 0..1000000 {
             unsafe {
                 asm!("NOP");
@@ -41,12 +41,16 @@ extern "C" fn _start() -> ! {
 *
 * */
 
-fn write_character(text: &[u8], forecolor: u8, backcolor: u8, x: u8, y: u8) {
+fn write_character(text: &[u8], forecolor: u8, backcolor: u8, x: u8, y: u8, blink: bool) {
     unsafe {
         for (i, &byte) in text.iter().enumerate() {
             let index = ((y as isize * 80) + (x as isize + i as isize)) * 2;
             *VGA_BUFFER.offset(index) = byte;
-            *VGA_BUFFER.offset(index + 1) = (backcolor << 4) | (forecolor & 0x0F);
+            let mut attribute = (backcolor << 4) | (forecolor & 0x0F);
+            if blink {
+                attribute |= 0x80;
+            }
+            *VGA_BUFFER.offset(index + 1) = attribute;
         }
     }
 }
@@ -57,7 +61,7 @@ fn clear_screen(background: vga_buffer::Color) {
             let char_offset = i * 2;
             let attr_offset = char_offset + 1;
             *VGA_BUFFER.add(char_offset) = b' ';
-            *VGA_BUFFER.add(attr_offset) = background.as_u8() << 4;
+            *VGA_BUFFER.add(attr_offset) = (background as u8) << 4;
         }
     }
 }

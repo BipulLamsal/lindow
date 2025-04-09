@@ -1,3 +1,6 @@
+const BUFFER_HEIGHT: usize = 25;
+const BUFFER_WIDTH: usize = 80;
+
 #[repr(u8)]
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -20,13 +23,25 @@ pub enum Color {
     White = 0xF,
 }
 
-impl Color {
-    pub fn as_u8(self) -> u8 {
-        self as u8
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(dead_code)]
+struct ColorCode(u8);
+impl ColorCode {
+    fn new(foreground: Color, background: Color) -> ColorCode {
+        Self(((background as u8) << 4) | ((foreground as u8) & 0x0F))
     }
 }
 
-struct ColorCode(u8);
-impl ColorCode {
-    fn new(foreground: Color, background: Color) -> ColorCode {}
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(C)]
+#[allow(dead_code)]
+struct ScreenChar {
+    ascii_character: u8,
+    color_code: ColorCode,
+    blink: u8,
+}
+
+#[repr(transparent)]
+struct Buffer {
+    chars: [[ScreenChar; BUFFER_WIDTH]; BUFFER_HEIGHT],
 }
