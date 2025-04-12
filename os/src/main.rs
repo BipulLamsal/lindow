@@ -7,8 +7,6 @@
 use core::arch::asm;
 use core::fmt::Write;
 use core::panic::PanicInfo;
-const VGA_BUFFER: *mut u8 = 0xb8000 as *mut u8;
-const SCREEN_SIZE: usize = 80 * 50;
 
 mod vga_buffer;
 use crate::vga_buffer::*;

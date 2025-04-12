@@ -6,8 +6,18 @@ use core::{
 // TODO
 // 1. scrolling screen
 // 2. maybe println and print macro
+// 3. clearing the whole screen
+// 4. clearning the whole row [X]
+// 5. making the last row as terminal style warning
+//
 
+use spin::lazy::Lazy;
+use spin::Mutex;
 use volatile::Volatile;
+
+// static
+pub static mut WRITER: Lazy<Mutex<Writer>> =
+    Lazy::new(|| Mutex::new(WriterBuilder::default().build()));
 
 const BUFFER_HEIGHT: usize = 25;
 const BUFFER_WIDTH: usize = 80;
@@ -56,6 +66,15 @@ impl ColorCode {
 struct ScreenChar {
     ascii_character: u8,
     color_code: ColorCode,
+}
+
+impl ScreenChar {
+    fn new(ascii_character: u8, color_code: ColorCode) -> Self {
+        Self {
+            ascii_character,
+            color_code,
+        }
+    }
 }
 // transparent accepts only one value and acts a wrapper so if multiple value needs to be
 // represnted use repr c
@@ -157,9 +176,34 @@ impl Writer {
         }
     }
     fn new_line(&mut self) {
-        self.row_position += 1;
-        self.row_position %= BUFFER_HEIGHT;
+        if self.row_position < BUFFER_HEIGHT - 1 {
+            self.row_position += 1;
+        } else {
+            // scroll  everythign up so row starts at 1 because row 1 is copied to row 0
+            for row in 1..BUFFER_HEIGHT {
+                for col in 0..BUFFER_WIDTH {
+                    let character = self.buffer.chars[row][col].read();
+                    self.buffer.chars[row - 1][col].write(character);
+                }
+            }
+            // clear the last row
+            self.clear_current_row();
+        }
         self.column_position = 0;
+    }
+    fn clear_current_row(&mut self) {
+        self.clear_row(self.row_position);
+    }
+
+    fn clear_row(&mut self, row: usize) {
+        if row >= BUFFER_HEIGHT {
+            return; // invalid row, do nothing
+        }
+
+        let blank_value = ScreenChar::new(b' ', self.color_code);
+        for col in 0..BUFFER_WIDTH {
+            self.buffer.chars[row][col].write(blank_value);
+        }
     }
 
     pub fn write_string(&mut self, s: &str) {

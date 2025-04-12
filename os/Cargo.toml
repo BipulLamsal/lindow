@@ -7,6 +7,10 @@ edition = "2018"
 [dependencies]
 bootloader = "0.9"
 volatile = "0.2.6"
+spin = {version="0.10.0", features=["lazy"]}
+
+
+
 
 [profile.dev]
 panic = "abort" # so basically this allows to terminate the process upon panic
