@@ -5,19 +5,26 @@ use core::{
 
 // TODO
 // 1. scrolling screen
-// 2. maybe println and print macro
-// 3. clearing the whole screen
+// 2. maybe println and print macro [x]
+// 3. clearing the whole screen [x]
 // 4. clearning the whole row [X]
-// 5. making the last row as terminal style warning
-//
+// 5. making the last row as terminal style warning (maybe i need to seperate thee writer and
+//    different eol modes but for now it is okay to have only one kind)
 
 use spin::lazy::Lazy;
 use spin::Mutex;
 use volatile::Volatile;
 
-// static
-pub static mut WRITER: Lazy<Mutex<Writer>> =
-    Lazy::new(|| Mutex::new(WriterBuilder::default().build()));
+//
+// mut static is unsafe so mutex would be better soultion here
+pub static WRITER: Lazy<Mutex<Writer>> = Lazy::new(|| Mutex::new(WriterBuilder::default().build()));
+pub static EOLWRITER: Lazy<Mutex<Writer>> = Lazy::new(|| {
+    let writer = WriterBuilder::default()
+        .row_position(BUFFER_HEIGHT - 1)
+        .color_code(ColorCode::new(Color::White, Color::Red))
+        .build();
+    Mutex::new(writer)
+});
 
 const BUFFER_HEIGHT: usize = 25;
 const BUFFER_WIDTH: usize = 80;
@@ -102,19 +109,19 @@ pub struct WriterBuilder {
 
 #[allow(dead_code)]
 impl WriterBuilder {
-    pub fn column_position(&mut self, value: usize) -> &mut Self {
+    pub fn column_position(mut self, value: usize) -> Self {
         self.column_position = value;
         self
     }
-    pub fn row_position(&mut self, value: usize) -> &mut Self {
+    pub fn row_position(mut self, value: usize) -> Self {
         self.row_position = value;
         self
     }
-    pub fn color_code(&mut self, value: ColorCode) -> &mut Self {
+    pub fn color_code(mut self, value: ColorCode) -> Self {
         self.color_code = value;
         self
     }
-    pub fn buffer(&mut self, value: &'static mut Buffer) -> &mut Self {
+    pub fn buffer(mut self, value: &'static mut Buffer) -> Self {
         self.buffer = value;
         self
     }
@@ -194,6 +201,13 @@ impl Writer {
     fn clear_current_row(&mut self) {
         self.clear_row(self.row_position);
     }
+    pub fn clear_screen(&mut self) {
+        for row in 0..BUFFER_HEIGHT {
+            self.clear_row(row);
+        }
+        self.row_position = 0;
+        self.column_position = 0;
+    }
 
     fn clear_row(&mut self, row: usize) {
         if row >= BUFFER_HEIGHT {
@@ -237,4 +251,21 @@ impl Write for Writer {
     fn write_fmt(&mut self, args: Arguments<'_>) -> Result {
         core::fmt::write(self, args)
     }
+}
+
+#[macro_export]
+macro_rules! println {
+    () => ($crate::print!("\n"));
+    ($($arg:tt)*) => ($crate::print!("{}\n", format_args!($($arg)*)));
+}
+
+#[macro_export]
+macro_rules! print {
+    ($($arg:tt)*) => ($crate::vga_buffer::_print(format_args!($($arg)*)));
+}
+
+#[doc(hidden)]
+pub fn _print(args: core::fmt::Arguments) {
+    use core::fmt::Write;
+    WRITER.lock().write_fmt(args).unwrap();
 }
