@@ -10,7 +10,11 @@ volatile = "0.2.6"
 spin = {version="0.10.0", features=["lazy"]}
 
 
+[build]
+target = "targert.json"
 
+[target.'cfg(target_os = "none")']
+runner = "bootimage runner"
 
 [profile.dev]
 panic = "abort" # so basically this allows to terminate the process upon panic

@@ -7,7 +7,7 @@
 use core::arch::asm;
 use core::fmt::Write;
 use core::panic::PanicInfo;
-use vga_buffer::EOLWRITER;
+use vga_buffer::WRITER;
 mod vga_buffer;
 
 // define bare metal main function to run within os runtime
@@ -15,16 +15,20 @@ mod vga_buffer;
 extern "C" fn _start() -> ! {
     loop {
         helloworld();
+        // panic!("This is the example of an error")
     }
 }
 
 fn helloworld() {
-    write!(EOLWRITER.lock(), "{}", 1234).unwrap();
-    for _ in 0..1000000 {
+    println!("tero bajer");
+    println!("huhuhu");
+    println!("hakunkunkun");
+    for _ in 0..1000 {
         unsafe {
             asm!("NOP");
         }
     }
+    panic!("i was jus playing around \n not reakllly i was goofing \n jk jk i just want to beat the meat");
 }
 
 /*
@@ -54,6 +58,8 @@ fn helloworld() {
 
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    write!(EOLWRITER.lock(), "{}", info).unwrap();
+    let mut w = WRITER.lock();
+    w.terminate();
+    write!(w, "{}", info).unwrap();
     loop {}
 }

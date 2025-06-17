@@ -16,7 +16,7 @@ use spin::Mutex;
 use volatile::Volatile;
 
 //
-// mut static is unsafe so mutex would be better soultion here
+// mut static is unsafe so mutex is a better soultion here
 pub static WRITER: Lazy<Mutex<Writer>> = Lazy::new(|| Mutex::new(WriterBuilder::default().build()));
 pub static EOLWRITER: Lazy<Mutex<Writer>> = Lazy::new(|| {
     let writer = WriterBuilder::default()
@@ -26,7 +26,7 @@ pub static EOLWRITER: Lazy<Mutex<Writer>> = Lazy::new(|| {
     Mutex::new(writer)
 });
 
-const BUFFER_HEIGHT: usize = 25;
+pub const BUFFER_HEIGHT: usize = 25;
 const BUFFER_WIDTH: usize = 80;
 pub const VGA_BUFFER: *mut u8 = 0xb8000 as *mut u8;
 
@@ -58,7 +58,7 @@ pub enum Color {
 // the color code accepts 8 bits value
 pub struct ColorCode(u8);
 impl ColorCode {
-    fn new(foreground: Color, background: Color) -> ColorCode {
+    pub fn new(foreground: Color, background: Color) -> ColorCode {
         let attribute = ((background as u8) << 4) | ((foreground as u8) & 0x0F);
         ColorCode(attribute)
     }
@@ -229,6 +229,10 @@ impl Writer {
                 _ => self.write_byte(0xfe),
             }
         }
+    }
+    pub fn terminate(&mut self) {
+        self.row_position = BUFFER_HEIGHT - 1;
+        self.color_code = ColorCode::new(Color::White, Color::Red);
     }
     // pub fn clean(&mut self) {
     // }
