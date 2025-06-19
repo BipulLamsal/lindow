@@ -1,0 +1,2 @@
+Building bootloader
+Running: `qemu-system-x86_64 -drive format=raw,file=target/target/debug/bootimage-os.bin`

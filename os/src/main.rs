@@ -2,13 +2,26 @@
 // file descriptor provided by the operating system.
 // understanding how the error handling works in rust
 //
+//
+
 #![no_std]
 #![no_main]
+#![feature(custom_test_frameworks)]
+#![test_runner(crate::test_runner)]
+
 use core::arch::asm;
 use core::fmt::Write;
 use core::panic::PanicInfo;
 use vga_buffer::WRITER;
 mod vga_buffer;
+
+#[cfg(test)]
+pub fn test_runner(tests: &[&dyn Fn()]) {
+    println!("Running {} tests", tests.len());
+    for test in tests {
+        test()
+    }
+}
 
 // define bare metal main function to run within os runtime
 #[no_mangle]
@@ -20,9 +33,6 @@ extern "C" fn _start() -> ! {
 }
 
 fn helloworld() {
-    println!("tero bajer");
-    println!("huhuhu");
-    println!("hakunkunkun");
     for _ in 0..1000 {
         unsafe {
             asm!("NOP");
@@ -55,6 +65,8 @@ fn helloworld() {
 //         }
 //     }
 // }
+//
+//
 
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
