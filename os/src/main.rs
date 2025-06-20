@@ -8,7 +8,7 @@
 #![no_main]
 #![feature(custom_test_frameworks)]
 #![test_runner(crate::test_runner)]
-
+#![reexport_test_harness_main = "main_test"]
 use core::arch::asm;
 use core::fmt::Write;
 use core::panic::PanicInfo;
@@ -26,19 +26,19 @@ pub fn test_runner(tests: &[&dyn Fn()]) {
 // define bare metal main function to run within os runtime
 #[no_mangle]
 extern "C" fn _start() -> ! {
+    #[cfg(test)]
+    main_test();
     loop {
-        helloworld();
+        // helloworld();
         // panic!("This is the example of an error")
     }
 }
-
 fn helloworld() {
     for _ in 0..1000 {
         unsafe {
             asm!("NOP");
         }
     }
-    panic!("i was jus playing around \n not reakllly i was goofing \n jk jk i just want to beat the meat");
 }
 
 /*
@@ -67,6 +67,13 @@ fn helloworld() {
 // }
 //
 //
+
+#[test_case]
+fn trivial_assertion() {
+    println!("trivial assertion...");
+    assert_eq!(1, 1);
+    println!("[ok]");
+}
 
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {

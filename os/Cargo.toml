@@ -16,9 +16,12 @@ target = "targert.json"
 [target.'cfg(target_os = "none")']
 runner = "bootimage runner"
 
-[profile.dev]
-panic = "abort" # so basically this allows to terminate the process upon panic
-
+# [profile.dev]
+# panic = "abort" # so basically this allows to terminate the process upon panic
+#
 [profile.release]
 panic = "abort"
 
+
+[package.metadata.bootimage]
+test-args = ["-device", "isa-debug-exit,iobase=0xf4,iosize=0x04"]
