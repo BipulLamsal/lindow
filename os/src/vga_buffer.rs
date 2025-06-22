@@ -1,3 +1,4 @@
+use crate::serial_print;
 use core::{
     char,
     fmt::{Arguments, Result, Write},
@@ -5,7 +6,7 @@ use core::{
 
 // TODO
 // 1. scrolling screen
-// 2. maybe println and print macro [x]
+// 2. maybe println and print macro [x]:
 // 3. clearing the whole screen [x]
 // 4. clearning the whole row [X]
 // 5. making the last row as terminal style warning (maybe i need to seperate thee writer and
@@ -193,8 +194,8 @@ impl Writer {
                     self.buffer.chars[row - 1][col].write(character);
                 }
             }
-            // clear the last row
-            self.clear_current_row();
+            self.clear_row(BUFFER_HEIGHT - 1);
+            self.row_position = BUFFER_HEIGHT - 1;
         }
         self.column_position = 0;
     }
@@ -260,7 +261,7 @@ impl Write for Writer {
 #[macro_export]
 macro_rules! println {
     () => ($crate::print!("\n"));
-    ($($arg:tt)*) => ($crate::print!("{}\n", format_args!($($arg)*)));
+    ($($arg:tt)*) => ($crate::print!("\n{}", format_args!($($arg)*)));
 }
 
 #[macro_export]
@@ -272,4 +273,52 @@ macro_rules! print {
 pub fn _print(args: core::fmt::Arguments) {
     use core::fmt::Write;
     WRITER.lock().write_fmt(args).unwrap();
+}
+
+#[test_case]
+fn test_println_simple() {
+    println!("test_println_simple_output: I am not Bipuli");
+}
+
+#[test_case]
+fn test_println_many() {
+    for _ in 0..300 {
+        println!("test_println_simple_output: I am not Bipuli");
+    }
+}
+
+#[test_case]
+fn test_clear_screen() {
+    WRITER.lock().clear_screen();
+}
+
+#[test_case]
+fn test_screen_height() {
+    let test_value = "TEST";
+
+    for _ in 0..BUFFER_HEIGHT {
+        println!("{}", test_value);
+    }
+    let writer = WRITER.lock();
+
+    for (i, expected_char) in test_value.chars().enumerate() {
+        let screen_char = writer.buffer.chars[BUFFER_HEIGHT - 1][i].read();
+        assert_eq!(screen_char.ascii_character, expected_char as u8);
+    }
+}
+
+#[test_case]
+fn test_screen_scroll() {
+    for i in 0..BUFFER_HEIGHT {
+        println!("{}", i);
+    }
+    let test_value = "BIPULI";
+    println!("{}", test_value);
+    let writer = WRITER.lock();
+    let screen_char = writer.buffer.chars[0][0].read();
+    assert_eq!(b'1', screen_char.ascii_character);
+    for (i, c) in test_value.chars().enumerate() {
+        let screen_char = writer.buffer.chars[BUFFER_HEIGHT - 1][i].read();
+        assert_eq!(screen_char.ascii_character, c as u8);
+    }
 }
