@@ -1,4 +1,3 @@
-use crate::serial_print;
 use core::{
     char,
     fmt::{Arguments, Result, Write},
@@ -194,13 +193,13 @@ impl Writer {
                     self.buffer.chars[row - 1][col].write(character);
                 }
             }
-            self.clear_row(BUFFER_HEIGHT - 1);
+            self.clear_last_row();
             self.row_position = BUFFER_HEIGHT - 1;
         }
         self.column_position = 0;
     }
-    fn clear_current_row(&mut self) {
-        self.clear_row(self.row_position);
+    fn clear_last_row(&mut self) {
+        self.clear_row(BUFFER_HEIGHT - 1);
     }
     pub fn clear_screen(&mut self) {
         for row in 0..BUFFER_HEIGHT {
