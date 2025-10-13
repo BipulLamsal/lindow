@@ -5,6 +5,7 @@
 #![feature(custom_test_frameworks)]
 #![test_runner(crate::test_runner)]
 #![reexport_test_harness_main = "main_test"]
+pub mod gdt;
 pub mod interrupts;
 pub mod serial;
 pub mod vga_buffer;
@@ -13,7 +14,24 @@ pub use crate::serial::_print;
 use core::panic::PanicInfo;
 
 pub fn init() {
+    gdt::init();
     interrupts::init_idt();
+}
+
+// basically loops for a random memory location and screams me read withtout the compiler
+// optimization take it away well this idea gives me page fault so big no
+
+/// Let x86 asm code do the cpu burning thing for us
+pub fn delay(mut count: u64) {
+    // let ptr: *mut u8 = core::ptr::null_mut();
+    unsafe {
+        core::arch::asm!(
+            "2:",
+            "sub {0}, 1",
+            "jnz 2b",
+            inout(reg) count,
+        );
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
