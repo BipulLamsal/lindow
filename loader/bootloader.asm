@@ -1,6 +1,10 @@
 [BITS 16]
 [ORG 0x7C00]
 
+
+
+
+
 main:
     mov ax, 0
     mov es, ax
@@ -26,6 +30,8 @@ main:
     mov bp, 0x7C00
     mov sp, bp
 
+    mov dx, 0x1FB6
+    call hex_print
 
     jmp $                   ; stop here
 
@@ -64,6 +70,10 @@ stack_trace:
     jnz loop
     
     RET
+
+%include "hex_print.asm" 
+
+
 ;; cpu isntructon never run this
 
 msg: db 'Hello world', 0
