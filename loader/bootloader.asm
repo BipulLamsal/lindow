@@ -3,10 +3,15 @@
 
 main:
     mov ax, 0
-    mov ds, ax
     mov es, ax
-    mov ss, ax  
-    mov sp, 0x7C00          ; stack grows from bottom to top
+    
+    mov bp, 0x7C00
+    mov sp, bp
+
+    push 0
+    push 'P'
+    push 'I'
+    push 'B'
 
     mov ah, 0x01            ; cursor shape
     mov cx, 0x0007
@@ -14,6 +19,14 @@ main:
 
     call page
     call print_string
+
+    mov ah, 0x0e
+    call stack_trace
+    
+    mov bp, 0x7C00
+    mov sp, bp
+
+
     jmp $                   ; stop here
 
 page:
@@ -39,6 +52,18 @@ print_string:
     int 0x10
     ret
 
+stack_trace:
+    mov bx, sp
+
+    loop:
+    add bx, 2
+    mov dx, [bx]
+    mov al, dl
+    int 0x10
+    cmp al, 0
+    jnz loop
+    
+    RET
 ;; cpu isntructon never run this
 
 msg: db 'Hello world', 0
