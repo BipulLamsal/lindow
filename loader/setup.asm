@@ -1,0 +1,12 @@
+DISK_ERROR_MSG: db 'Disk Read Error'
+DISK_ERROR_MSG_LEN: equ $ - DISK_ERROR_MSG ;; constant  
+
+SUCCESS_MSG: db 'SUCCESS'
+SUCCESS_MSG_LEN: equ $ - SUCCESS_MSG
+
+BOOT_DRIVE: db 0
+
+
+
+
+

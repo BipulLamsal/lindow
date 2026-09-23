@@ -8,6 +8,13 @@
 multiplexes the ISRs by what we could imagine as a big switch statement, based usually
 on the value set in one of the CPUs general purpose registers, ax, prior to raising the
 interrupt.
+- Shouldn't really trust the wikipedia but what else can we do bro!
+
+```
+nasm disk_read.asm -f bin -o disk.bin
+qemu-system-x86_64 -drive file=./disk.bin,format=raw
+
+```
 
 # References
 https://viralpatel.net/taj/tutorial/booting.php
@@ -18,3 +25,4 @@ https://web.stanford.edu/class/cs107/resources/x86-64-reference.pdf
 https://osdev.wiki/wiki/BIOS
 https://en.wikipedia.org/wiki/INT_10H
 https://angom.myweb.cs.uwindsor.ca/teaching/cs330/WritingOS.pdf
+https://en.wikipedia.org/wiki/INT_13H

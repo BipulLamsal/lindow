@@ -2,9 +2,6 @@
 [ORG 0x7C00]
 
 
-
-
-
 main:
     mov ax, 0
     mov es, ax
@@ -82,3 +79,4 @@ len equ $ - msg - 1
 times 510 - ($ - $$) db 0
 db 0x55
 db 0xAA
+
