@@ -20,11 +20,20 @@ gdt_data:
     db 11001111b
     db 0x0 
 
+gdt_vga_code:
+    dw 0xffff          ; limit
+    dw 0x8000          ; base bits 0-15  (0xB8000 & 0xFFFF = 0x8000)
+    db 0x0B            ; base bits 16-23 (0xB8000 >> 16 = 0x0B)
+    db 10011010b       ; access byte (code, executable, present, ring0)
+    db 11001111b       ; flags limit high
+    db 0x0             ; base bits 24-31
+
 gdt_end:
 
 gdt_descriptor:
     dw gdt_end - gdt_start - 1 
     dd gdt_start
 
-CODE_SEG equ gdt_code - gdt_start
-DATA_SEG equ gdt_data - gdt_start
+CODE_SEG equ gdt_code - gdt_start ;; 0x08
+DATA_SEG equ gdt_data - gdt_start ;; 0x10
+VGS_SEG equ gdt_vga_code - gdt_start 
