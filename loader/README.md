@@ -26,3 +26,4 @@ https://osdev.wiki/wiki/BIOS
 https://en.wikipedia.org/wiki/INT_10H
 https://angom.myweb.cs.uwindsor.ca/teaching/cs330/WritingOS.pdf
 https://en.wikipedia.org/wiki/INT_13H
+https://wiki.osdev.org/GDT_Tutorial
