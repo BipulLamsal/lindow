@@ -36,4 +36,4 @@ gdt_descriptor:
 
 CODE_SEG equ gdt_code - gdt_start ;; 0x08
 DATA_SEG equ gdt_data - gdt_start ;; 0x10
-VGS_SEG equ gdt_vga_code - gdt_start 
+VGA_SEG equ gdt_vga_code - gdt_start 

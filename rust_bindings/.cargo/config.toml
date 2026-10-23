@@ -1,0 +1,7 @@
+[build]
+target = "i686-lindow.json"
+rustflags = ["-C", "link-arg=-Ttext=0x1000", "-C", "link-arg=--entry=main", "-C", "link-arg=--image-base=0x1000"]
+
+[unstable]
+build-std = ["core", "compiler_builtins"]
+json-target-spec = true

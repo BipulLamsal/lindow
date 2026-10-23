@@ -1,7 +1,3 @@
-// learn about procedural macros
-// file descriptor provided by the operating system.
-// understanding how the error handling works in rust
-
 #![no_std]
 #![no_main]
 #![feature(breakpoint)]

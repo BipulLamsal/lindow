@@ -1,0 +1,10 @@
+[package]
+name = "kernel"
+version.workspace = true
+authors.workspace = true
+description.workspace = true
+edition = "2021"
+
+[[bin]]
+name = "kernel"
+path = "src/main.rs"

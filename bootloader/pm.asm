@@ -8,7 +8,7 @@ switch_to_pm:
     or eax, 0x1
     mov cr0, eax
 
-    jmp CODE_SEG:start_pm
+    jmp CODE_SEG:start_pm  
 
 
 [ bits 32]
@@ -20,8 +20,12 @@ start_pm:
     mov fs, ax
     mov gs, ax
 
-    ;; maybe 90000 better here?
-    mov sp, 0x9000
-    mov bp, sp
+    mov esp, 0x9000
+    mov ebp, esp
 
-    call begin_pm 
+    call begin_pm
+
+[BITS 32]
+begin_pm:
+    call KERNEL_OFFSET
+    jmp $

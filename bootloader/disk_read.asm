@@ -25,6 +25,8 @@ main:
 %include "setup.asm"
 %include "print_string.asm"
 %include "disk_load.asm"
+%include "load_kernel.asm"
+
 
 times 510 - ($ - $$) db 0
 db 0x55

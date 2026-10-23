@@ -1,4 +1,3 @@
-
 Running a bare minimun architecture, we need a rust target triple used for embedded systems which simply is ARM based no underlying OS embedded application binary interface
 ```
 # installing via rustup
